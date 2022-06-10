@@ -116,7 +116,7 @@ void jogaJogoVida(char **mAtual, int nL, int nC, int nCiclos)
   int c;
 
   //imprimindo na tela a matriz inicial
-  system("clear");
+  system(CLEAN);
   imprimeMatriz(mAtual,nL,nC); //TO DO
   // getchar();
   mAnt = alocaMatriz(nL,nC); //TO DO
@@ -128,7 +128,7 @@ void jogaJogoVida(char **mAtual, int nL, int nC, int nCiclos)
 
         atualizaMat(mAtual,mAnt,nL,nC); //TO DO implemente nesta fun��o as regras que atualizam a matriz mAtual conforme o jogo da vida
                                   //lembre de usar os dados de mAnt como a matriz do jogo no ciclo anterior para atualizar mAtual
-        system("clear");
+        system(CLEAN);
         imprimeMatriz(mAtual,nL,nC);// TO DO
         // getchar();
         sleep(0.100);
