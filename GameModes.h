@@ -1,5 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _WIN32 
+    #include <Windows.h> 
+    #define CLEAN "cls"
+#else 
+    #include <unistd.h> 
+    #define CLEAN "clear"
+#endif
 
 #define ORG 'X'
 #define VAZ '.'
