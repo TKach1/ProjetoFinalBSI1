@@ -12,7 +12,7 @@
 #define VAZ '.'
 #define TAM 101
 
-void inicBlinker(char **m, int nL, int nC);
+void inicBlinker(char **m, int nL, int nC); // Apenas as inicializações
 void inicBloco(char **m, int nL, int nC);
 void inicSapo(char **m, int nL, int nC);
 void inicGlider(char **m, int nL, int nC);

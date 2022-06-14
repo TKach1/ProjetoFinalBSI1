@@ -1,15 +1,19 @@
-#include "GameModes.h"
+#include "GameModes.h" //biblioteca para inicializar os modos já feitos pela prof
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////
-void desalocaMatriz(char **m,int nL){
+/* 
+                        RESUMO
+    O programa funciona com duas matrizes (antiga e atual), sendo a antiga um copia da
+    ultima atualização da Atual, sendo usada apenas para verificação para atualizar a Atual.
+
+    Para saber como é feita a verificação ir para void atualizaMat.
+*/
+void desalocaMatriz(char **m,int nL){ //O NOME JA DIZ MUITA COISA (Libera espaço na RAM + notinha de bom dev)
     for(int i = 0; i<nL; i++){
         free(m[i]);
     }
     free(m);
 }
-char** alocaMatriz(int nL,int nC){
+char** alocaMatriz(int nL,int nC){ //O NOME JA DIZ MUITA COISA
     char** m;
     m = (char**) malloc (nL * sizeof(char*));
     for(int i= 0;i<nL;i++){
@@ -17,7 +21,7 @@ char** alocaMatriz(int nL,int nC){
     }
     return m;
 }
-void imprimeMatriz(char **mAtual,int nL,int nC){
+void imprimeMatriz(char **mAtual,int nL,int nC){ //O NOME JA DIZ MUITA COISA
     int i,j;
     for(i=0;i<nL;i++){
         for(j=0;j<nC;j++){
@@ -26,19 +30,19 @@ void imprimeMatriz(char **mAtual,int nL,int nC){
         printf("\n");
     }
 }
-void byebye(char **mat, int nL){
+void byebye(char **mat, int nL){ // QUITA DO PROGRAMA
     desalocaMatriz(mat,nL);
     printf("\nSaindo...");
     Sleep(100);
     exit(0);
 }
-void limpaMatriz(char **m, int nL, int nC){
+void limpaMatriz(char **m, int nL, int nC){ // DEFINE A MATRIZ TODA COM "."
     int i,j;
     for(i=0;i<nL;i++)
      for(j=0;j<nC;j++)
         m[i][j]=VAZ;
 }
-void menuInicJogo(char **mat, int nL, int nC){
+void menuInicJogo(char **mat, int nL, int nC){ // MENU INICIAL
     int opcao;
 
     printf("(1)Bloco\n(2)Blinker\n(3)Sapo\n(4)Glider\n(5)LWSS\n(0)Sair\nEntre com a opcao: ");
@@ -50,25 +54,22 @@ void menuInicJogo(char **mat, int nL, int nC){
         case 3:   inicSapo(mat,nL,nC); break;
         case 4:   inicGlider(mat,nL,nC); break;
         case 5:   inicLWSS(mat,nL,nC); break;
-        default: byebye(mat,nL); break;
+        default: byebye(mat,nL); break; // CASO QQL COISA FOR DIGITADA SEM SER 1,2,3,4,5 ELE SAI DO PROGRAMA
     }
-        imprimeMatriz(mat,nL,nC);// TO DO
+        imprimeMatriz(mat,nL,nC);
 
         printf("Se inicializacao correta digite qualquer tecla para iniciar o jogo..."); while(getchar()!='\n'); getchar();
 
 }
-void copiaMatriz(char **mAnt,char **mAtual,int nL,int nC){
+void copiaMatriz(char **mAnt,char **mAtual,int nL,int nC){ // COPIA A MATRIZ NOVA PARA A ANTIGA
     int i,j;
     for(i=0;i<nL;i++)
         for(j=0;j<nC;j++)
             mAnt[i][j]=mAtual[i][j];
 }
-void atualizaMat(char **mAtual,char **mAnt,int nL,int nC){
+void atualizaMat(char **mAtual,char **mAnt,int nL,int nC){ //FUNCAO MAIS IMPORTANTE
     int l, c;
     int vizinhos = 0;
-    //printf("\n\n\n\n\nIMPRIMINDO\n\n\n\n\n\n\n\n\n");
-    //imprimeMatriz(mAnt,nL,nC);
-    //getchar();
     for(l = 0; l<nL; l++){
         for(c = 0; c<nC; c++){
             vizinhos = 0;
@@ -82,6 +83,13 @@ void atualizaMat(char **mAtual,char **mAnt,int nL,int nC){
                 O número representa qual posição está sendo
                 verificada, tendo como base o organismo na posição
                 "5".
+
+                l = Linhas
+                c = Colunas
+
+                mAnt = matriz apenas para verificação
+
+                mAtual = matriz que será atualizada para impressão e para salvar em arquivo
             */
             if(l != 0){
                 if(c != 0){
@@ -134,9 +142,6 @@ void atualizaMat(char **mAtual,char **mAnt,int nL,int nC){
         }
     }
 }
-//////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////// Parte a ser completada //////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////
 
 void jogaJogoVida(char **mAtual, int nL, int nC, int nCiclos)
 {
@@ -145,11 +150,10 @@ void jogaJogoVida(char **mAtual, int nL, int nC, int nCiclos)
 
   //imprimindo na tela a matriz inicial
   system(CLEAN);
-  imprimeMatriz(mAtual,nL,nC); //TO DO
-  // getchar();
-  mAnt = alocaMatriz(nL,nC); //TO DO
+  imprimeMatriz(mAtual,nL,nC);
+  mAnt = alocaMatriz(nL,nC);
 
-  for(c=1;c<=nCiclos;c++)
+  for(c=1;c<=nCiclos;c++) // roda até quandos ciclos o usuario quiser.
   {
         copiaMatriz(mAnt,mAtual,nL,nC);
         atualizaMat(mAtual,mAnt,nL,nC); 
