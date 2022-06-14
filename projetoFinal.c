@@ -30,6 +30,38 @@ void imprimeMatriz(char **mAtual,int nL,int nC){ //O NOME JA DIZ MUITA COISA
         printf("\n");
     }
 }
+void gotoxy(int x,int y) //vai para a posição destinada
+{
+    printf("%c[%d;%df",0x1B,y,x);
+}
+
+void imprimeMatrizNula(int nL,int nC){ //O NOME JA DIZ MUITA COISA
+    int i,j;
+    for(i=0;i<nL;i++){
+        for(j=0;j<nC;j++){
+            gotoxy(j,i);
+            printf("%c", VAZ);
+        }
+        printf("\n");
+    }
+}
+
+void imprimeMatrizB(char **mAtual,char **mAnt,int nL,int nC){ //O NOME JA DIZ MUITA COISA (só que mais leve)
+    int i,j;
+    for(i=0;i<nL;i++){
+        for(j=0;j<nC;j++){
+            if(mAtual[i][j] != VAZ){
+                gotoxy(j,i);
+                printf("%c",mAtual[i][j]);
+            }if(mAnt[i][j] == ORG && mAtual[i][j] == VAZ){
+                gotoxy(j,i);
+                printf("%c",VAZ);
+            }
+        }
+        printf("\n");
+    }
+}
+
 void byebye(char **mat, int nL){ // QUITA DO PROGRAMA
     desalocaMatriz(mat,nL);
     printf("\nSaindo...");
@@ -159,7 +191,29 @@ void jogaJogoVida(char **mAtual, int nL, int nC, int nCiclos)
         atualizaMat(mAtual,mAnt,nL,nC); 
         system(CLEAN);
         imprimeMatriz(mAtual,nL,nC);
-        Sleep(100);
+        Sleep((int)1000/nCiclos);
+  }
+  desalocaMatriz(mAnt,nL);
+}
+
+void jogaJogoVidaB(char **mAtual, int nL, int nC, int nCiclos) // MODO MAIS LEVE E BONITO
+{
+  char **mAnt;
+  int c;
+
+  //imprimindo na tela a matriz inicial
+  system(CLEAN);
+  imprimeMatriz(mAtual,nL,nC);
+  mAnt = alocaMatriz(nL,nC);
+  imprimeMatrizNula(nL, nC);
+
+  for(c=1;c<=nCiclos;c++) // roda até quandos ciclos o usuario quiser.
+  {
+        copiaMatriz(mAnt,mAtual,nL,nC);
+        atualizaMat(mAtual,mAnt,nL,nC); 
+        //system(CLEAN);
+        imprimeMatrizB(mAtual,mAnt,nL,nC);
+        Sleep((int)1000/nCiclos);
   }
   desalocaMatriz(mAnt,nL);
 }
