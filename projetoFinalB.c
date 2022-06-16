@@ -7,16 +7,6 @@
 
     Para saber como é feita a verificação ir para void atualizaMat.
 */
-
-typedef struct tab{
-    char nomeJogo[TAM]; //o nome do jogo deve ser relativo ao padrao
-                        //de inicializacao. Por exemplo, JogoSapo ou JogoBloco
-    int ciclosVida; // Define quanto cada jogo vai rodar (ciclos)
-    int nL,nC; //dimensoes do tabuleiro linhas x colunas
-    char **m;   //Atenção! Essa matriz terá que ser alocada dinamicamente
-                //para que a funcao que inicializa possa funcionar
-}Tab;
-
 void desalocaMatriz(char **m,int nL){ //O NOME JA DIZ MUITA COISA (Libera espaço na RAM + notinha de bom dev)
     for(int i = 0; i<nL; i++){
         free(m[i]);
@@ -40,6 +30,37 @@ void imprimeMatriz(char **mAtual,int nL,int nC){ //O NOME JA DIZ MUITA COISA
         printf("\n");
     }
 }
+void gotoxy(int x,int y) //vai para a posição destinada
+{
+    printf("%c[%d;%df",0x1B,y,x);
+}
+
+void imprimeMatrizNula(int nL,int nC){ //O NOME JA DIZ MUITA COISA
+    int i,j;
+    for(i=0;i<nL;i++){
+        for(j=0;j<nC;j++){
+            gotoxy(j,i);
+            printf("%c", VAZ);
+        }
+        printf("\n");
+    }
+}
+
+void imprimeMatrizB(char **mAtual,char **mAnt,int nL,int nC){ //O NOME JA DIZ MUITA COISA (só que mais leve)
+    int i,j;
+    for(i=0;i<nL;i++){
+        for(j=0;j<nC;j++){
+            if(mAtual[i][j] != VAZ){
+                gotoxy(j,i);
+                printf("%c",mAtual[i][j]);
+            }if(mAnt[i][j] == ORG && mAtual[i][j] == VAZ){
+                gotoxy(j,i);
+                printf("%c",VAZ);
+            }
+        }
+        printf("\n");
+    }
+}
 
 void byebye(char **mat, int nL){ // QUITA DO PROGRAMA
     desalocaMatriz(mat,nL);
@@ -53,24 +74,21 @@ void limpaMatriz(char **m, int nL, int nC){ // DEFINE A MATRIZ TODA COM "."
      for(j=0;j<nC;j++)
         m[i][j]=VAZ;
 }
-void menuInicJogo(Tab *mat){ // MENU INICIAL
+void menuInicJogo(char **mat, int nL, int nC){ // MENU INICIAL
     int opcao;
+
     printf("(1)Bloco\n(2)Blinker\n(3)Sapo\n(4)Glider\n(5)LWSS\n(0)Sair\nEntre com a opcao: ");
     scanf("%d",&opcao);
-
-    Tab m = *mat;
     switch(opcao)
     {
-        case 1:   inic(m.m,m.nL,m.nC, "Bloco"); strcpy(m.nomeJogo, "Bloco"); break;
-        case 2:   inic(m.m,m.nL,m.nC, "Blinker"); strcpy(m.nomeJogo, "Blinker"); break;
-        case 3:   inic(m.m,m.nL,m.nC, "Sapo"); strcpy(m.nomeJogo, "Sapo"); break;
-        case 4:   inic(m.m,m.nL,m.nC, "Glider"); strcpy(m.nomeJogo, "Glider"); break;
-        case 5:   inic(m.m,m.nL,m.nC, "LWSS"); strcpy(m.nomeJogo, "LWSS"); break;
-        default: byebye(m.m,m.nL); break; // CASO QQL COISA FOR DIGITADA SEM SER 1,2,3,4,5 ELE SAI DO PROGRAMA
+        case 1:   inicBloco(mat,nL,nC); break;
+        case 2:   inicBlinker(mat,nL,nC); break;
+        case 3:   inicSapo(mat,nL,nC); break;
+        case 4:   inicGlider(mat,nL,nC); break;
+        case 5:   inicLWSS(mat,nL,nC); break;
+        default: byebye(mat,nL); break; // CASO QQL COISA FOR DIGITADA SEM SER 1,2,3,4,5 ELE SAI DO PROGRAMA
     }
-        *mat = m;
-        printf("%s \n", m.nomeJogo);
-        imprimeMatriz(m.m,m.nL,m.nC);
+        imprimeMatriz(mat,nL,nC);
 
         printf("Se inicializacao correta digite qualquer tecla para iniciar o jogo..."); while(getchar()!='\n'); getchar();
 
@@ -157,49 +175,75 @@ void atualizaMat(char **mAtual,char **mAnt,int nL,int nC){ //FUNCAO MAIS IMPORTA
     }
 }
 
-void jogaJogoVida(Tab *mat)
+void jogaJogoVida(char **mAtual, int nL, int nC, int nCiclos)
 {
   char **mAnt;
   int c;
-  Tab m = *mat;
+
   //imprimindo na tela a matriz inicial
   system(CLEAN);
-  imprimeMatriz(m.m,m.nL,m.nC);
-  mAnt = alocaMatriz(m.nL,m.nC);
+  imprimeMatriz(mAtual,nL,nC);
+  mAnt = alocaMatriz(nL,nC);
 
-  for(c=1;c<=m.ciclosVida;c++) // roda até quandos ciclos o usuario quiser.
+  for(c=1;c<=nCiclos;c++) // roda até quandos ciclos o usuario quiser.
   {
-        copiaMatriz(mAnt,m.m,m.nL,m.nC);
-        atualizaMat(m.m,mAnt,m.nL,m.nC); 
+        copiaMatriz(mAnt,mAtual,nL,nC);
+        atualizaMat(mAtual,mAnt,nL,nC); 
         system(CLEAN);
-        imprimeMatriz(m.m,m.nL,m.nC);
-        Sleep((int)1000/m.ciclosVida);
+        imprimeMatriz(mAtual,nL,nC);
+        Sleep((int)1000/nCiclos);
   }
-  desalocaMatriz(mAnt,m.nL);
+  desalocaMatriz(mAnt,nL);
 }
+
+void jogaJogoVidaB(char **mAtual, int nL, int nC, int nCiclos) // MODO MAIS LEVE E BONITO
+{
+  char **mAnt;
+  int c;
+
+  //imprimindo na tela a matriz inicial
+  system(CLEAN);
+  imprimeMatriz(mAtual,nL,nC);
+  mAnt = alocaMatriz(nL,nC);
+  imprimeMatrizNula(nL, nC);
+
+  for(c=1;c<=nCiclos;c++) // roda até quandos ciclos o usuario quiser.
+  {
+        copiaMatriz(mAnt,mAtual,nL,nC);
+        atualizaMat(mAtual,mAnt,nL,nC); 
+        //system(CLEAN);
+        imprimeMatrizB(mAtual,mAnt,nL,nC);
+        Sleep((int)1000/nCiclos);
+  }
+  desalocaMatriz(mAnt,nL);
+}
+
 
 int main()
 {
-    int j;
-    Tab *mat;
 
-    printf("\nDigite quantos jogos você quer jogar: ");
-    scanf("%d", &j);
+    char **mat;
 
-    mat = ( Tab *) malloc ( j * sizeof ( Tab ));
+    int nL = 0,nC = 0,nCiclos = 0;
 
-    for(int i = 0; i < j; i++){
-        printf("\nDigite o Tamanho da Matriz (Largura): ");
-        scanf("%d", &mat[i].nC);
-        printf("\nDigite o Tamanho da Matriz (Altura): ");
-        scanf("%d", &mat[i].nL);
-        printf("\nDigite o Numero de Ciclos: ");
-        scanf("%d", &mat[i].ciclosVida);
-        mat[i].m = alocaMatriz(mat[i].nL, mat[i].nL);
-        menuInicJogo(&mat[i]);
-        jogaJogoVida(&mat[i]); 
-        printf("O jogo anterior foi: %s \n", mat[i].nomeJogo);
-    }
+    //TODO la�o INdeterminado que repete enquanto o usuario quiser continuar jogando:
+    //cada jogo equivale a nCiclos de um padr�o de inicializacao
+    //por exemplo o usuario pode escolher jogar nCiclos do padr�o Sapo
+    // quando terminar jogar mais nCiclos do padr�o Blinker
+    // depois encerrar o programa
+    printf("\nDigite o Tamanho da Matriz (Largura): ");
+    scanf("%d", &nC);
+    printf("\nDigite o Tamanho da Matriz (Altura): ");
+    scanf("%d", &nL);
+    printf("\nDigite o Numero de Ciclos: ");
+    scanf("%d", &nCiclos);
+
+    mat = alocaMatriz(nL,nC);
+
+    while(1 > 0){
+        menuInicJogo(mat,nL,nC);
+        jogaJogoVida(mat,nL,nC,nCiclos); 
+    }//fim do laco indeterminado
 
 }
 
@@ -207,58 +251,69 @@ int main()
 //inicios///////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-void inic(char **m, int nL, int nC, char *modo)
-{   
-    int i,j, xInic=nL/2, yInic=nC/2, size, l = 1, lmax = 0, maxc = 0;
-    char chr;
-    FILE *fp;
-    char **padrao;
-    char txt[] = ".txt";
-    char mod[TAM];
-
-    strcpy(mod, modo);
-    strcat(mod, txt);
-    fp = fopen(mod, "r");
-
-    if(fp == NULL){
-        printf("Error opening");
-        exit(1);
-    }
-
-    chr = getc(fp);
-
-    while (chr != EOF)
-    {   
-        if (chr == '\n'){
-            l++;
-        }
-        if(((int)chr)-48 > maxc && chr != ',' && chr != '\n')
-            maxc = ((int)chr)-48;
-        chr = getc(fp);
-    }
-    padrao = alocaMatriz(l, maxc);
-    limpaMatriz(padrao,l,maxc);
-    lmax = l;
-    l = 0;
-    rewind(fp);
-    chr = getc(fp);
-    while (chr != EOF)
-    {
-        if (chr == '\n'){
-            l++;
-        }
-        if (chr != ',' && chr != '\n'){
-            padrao[l][((int)chr)-49] = ORG;
-        }
-        chr = getc(fp);
-    }
+void inicBlinker(char **m, int nL, int nC)
+{
+    char padrao[1][3]={{ORG,ORG,ORG}};
+    int i,j, xInic=nL/2, yInic=nC/2;
 
     limpaMatriz(m,nL,nC);
 
-    for(i=0;i<l+1;i++){
-        for(j=0;j<maxc;j++){
+    for(i=0;i<1;i++)
+        for(j=0;j<3;j++)
+        m[xInic+i][yInic+j]=padrao[i][j];
+}
+void inicBloco(char **m, int nL, int nC)
+{
+    char padrao[2][2]={{ORG,ORG},{ORG,ORG}};
+    int i,j,xInic=nL/2, yInic=nC/2;
+
+
+    limpaMatriz(m,nL,nC);
+
+
+    for(i=0;i<2;i++)
+        for(j=0;j<2;j++)
             m[xInic+i][yInic+j]=padrao[i][j];
-        }
-    }
-    fclose(fp);
+}
+void inicSapo(char **m, int nL, int nC)
+{
+
+    char padrao[2][4]={{VAZ,ORG,ORG,ORG},{ORG,ORG,ORG,VAZ}};
+    int i,j,xInic=nL/2, yInic=nC/2;
+
+    limpaMatriz(m,nL,nC);
+
+
+    for(i=0;i<2;i++)
+        for(j=0;j<4;j++)
+            m[xInic+i][yInic+j]=padrao[i][j];
+
+}
+void inicGlider(char **m, int nL, int nC)
+{
+    char padrao[3][3]={{ORG,ORG,ORG},{ORG,VAZ,VAZ},{VAZ,ORG,VAZ}};
+    int i,j,xInic,yInic;
+
+    limpaMatriz(m,nL,nC);
+
+    xInic=nL-4;
+    yInic=nC-4;
+
+    for(i=0;i<3;i++)
+        for(j=0;j<3;j++)
+            m[xInic+i][yInic+j]=padrao[i][j];
+}
+void inicLWSS(char **m, int nL, int nC)
+{
+    char padrao[4][5]={{VAZ,ORG,VAZ,VAZ,ORG},{ORG,VAZ,VAZ,VAZ,VAZ},{ORG,VAZ,VAZ,VAZ,ORG},{ORG,ORG,ORG,ORG,VAZ}};
+    int i,j,xInic,yInic;
+
+    limpaMatriz(m,nL,nC);
+
+    xInic=nL-5;
+    yInic=nC-6;
+
+    for(i=0;i<4;i++)
+        for(j=0;j<5;j++)
+            m[xInic+i][yInic+j]=padrao[i][j];
 }

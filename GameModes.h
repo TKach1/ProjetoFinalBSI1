@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #ifdef _WIN32 
     #include <Windows.h> 
     #define CLEAN "cls"
@@ -17,3 +18,4 @@ void inicBloco(char **m, int nL, int nC);
 void inicSapo(char **m, int nL, int nC);
 void inicGlider(char **m, int nL, int nC);
 void inicLWSS(char **m, int nL, int nC);
+void inic(char **m, int nL, int nC, char *modo);
