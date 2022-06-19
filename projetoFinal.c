@@ -157,14 +157,26 @@ void atualizaMat(char **mAtual,char **mAnt,int nL,int nC){ //FUNCAO MAIS IMPORTA
     }
 }
 
+void startRaid(char **mat,char **mAnt,int nL,int nC){ //Comeca a invasão
+    if(nL >= 20 && nC >= 20){ //tamanho minimo de matriz para ter invasores
+        int xInic = nL/1.5f, yInic = nC/1.5f;
+        char padrao[5][5]={{ORG,ORG,ORG,VAZ,ORG},{ORG,VAZ,VAZ,VAZ,VAZ},{VAZ,VAZ,VAZ ,ORG,ORG},{VAZ,ORG,ORG,VAZ,ORG},{ORG,VAZ,ORG,VAZ,ORG}}; // Paul Callahan's 5×5 infinite growth pattern
+        for(int i=0;i<5;i++)
+            for(int j=0;j<5;j++)
+                mat[xInic+i][yInic+j]=padrao[i][j];
+    }else{
+        printf("Não foi possivel inicializar inimigos (tamanhos de matrizes muito pequenos)");
+        Sleep(500);
+    }
+}
+
 void jogaJogoVida(Tab *mat)
 {
   char **mAnt;
   int c;
   Tab m = *mat;
-  //imprimindo na tela a matriz inicial
   system(CLEAN);
-  imprimeMatriz(m.m,m.nL,m.nC);
+  imprimeMatriz(m.m,m.nL,m.nC);  //imprimindo na tela a matriz inicial
   mAnt = alocaMatriz(m.nL,m.nC);
 
   for(c=1;c<=m.ciclosVida;c++) // roda até quandos ciclos o usuario quiser.
@@ -174,6 +186,8 @@ void jogaJogoVida(Tab *mat)
         system(CLEAN);
         imprimeMatriz(m.m,m.nL,m.nC);
         Sleep((int)1000/m.ciclosVida);
+        if(c == 20)
+            startRaid(m.m,mAnt,m.nL,m.nC);
   }
   desalocaMatriz(mAnt,m.nL);
 }
@@ -207,58 +221,58 @@ int main()
 //inicios///////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-void inic(char **m, int nL, int nC, char *modo)
+void inic(char **m, int nL, int nC, char *modo) //LER ARQUIVOS
 {   
     int i,j, xInic=nL/2, yInic=nC/2, size, l = 1, lmax = 0, maxc = 0;
     char chr;
-    FILE *fp;
+    FILE *fp; //INICIA UM TIPO DE ARQUIVO
     char **padrao;
     char txt[] = ".txt";
     char mod[TAM];
 
-    strcpy(mod, modo);
-    strcat(mod, txt);
-    fp = fopen(mod, "r");
+    strcpy(mod, modo); //MUDA A VARIAVEL mod PARA O NOME SELECIONADO NA FUNÇÃO QUE A CHAMA
+    strcat(mod, txt); //ADICIONA O .TXT AO FINAL DA SENTENÇA
+    fp = fopen(mod, "r"); //ABRE O ARQUIVO
 
-    if(fp == NULL){
+    if(fp == NULL){ //CASO NAO CONSIGA ABRIR, DA ERRO E ENCERRA
         printf("Error opening");
         exit(1);
     }
 
-    chr = getc(fp);
+    chr = getc(fp); //PEGA AO PRIMEIRO CARACTERE 
 
-    while (chr != EOF)
+    while (chr != EOF) //RODA ATE EOF (End Of File - Final do Arquivo) - este while serve para pegar o tamanho da matriz de dentro do arquivo
     {   
-        if (chr == '\n'){
-            l++;
+        if (chr == '\n'){ //QUANDO FOR QUEBRA DE LINHAS
+            l++; //CONTA LINHAS
         }
-        if(((int)chr)-48 > maxc && chr != ',' && chr != '\n')
+        if(((int)chr)-48 > maxc && chr != ',' && chr != '\n')//COMPARA PARA VER O TAMANHO DA MATRIZ HORIZONTALMENTE
             maxc = ((int)chr)-48;
-        chr = getc(fp);
+        chr = getc(fp); //PROX CARACTERE
     }
-    padrao = alocaMatriz(l, maxc);
+    padrao = alocaMatriz(l, maxc); //ALOCA MATRIZ DE ACORDO COM O TAMANHO
     limpaMatriz(padrao,l,maxc);
     lmax = l;
     l = 0;
-    rewind(fp);
-    chr = getc(fp);
-    while (chr != EOF)
+    rewind(fp); //VOLTA AO INICIO DO ARQUIVO
+    chr = getc(fp); //PEGA O PRIMEIRO CARACTERE
+    while (chr != EOF) //RODA ATE EOF (End Of File - Final do Arquivo)
     {
-        if (chr == '\n'){
-            l++;
+        if (chr == '\n'){ //QUANDO FOR QUEBRA DE LINHAS
+            l++; //CONTA LINHAS
         }
         if (chr != ',' && chr != '\n'){
-            padrao[l][((int)chr)-49] = ORG;
+            padrao[l][((int)chr)-49] = ORG; //INSERE NA VARIAVEL PADRAO O QUE O ARQUIVO CARREGA CONSIGO
         }
-        chr = getc(fp);
+        chr = getc(fp); //PROX CARACTERE
     }
 
     limpaMatriz(m,nL,nC);
 
     for(i=0;i<l+1;i++){
         for(j=0;j<maxc;j++){
-            m[xInic+i][yInic+j]=padrao[i][j];
+            m[xInic+i][yInic+j]=padrao[i][j]; //INSERE A VARIAVEL PADRAP NA NOSSA MATRIZ PRINCIPAL
         }
     }
-    fclose(fp);
+    fclose(fp); //Fecha arquivo
 }
